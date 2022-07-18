@@ -16,11 +16,11 @@ class RoundButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 16.0),
+      padding: EdgeInsets.symmetric(vertical: 0.0),
       child: Material(
         elevation: 5.0,
         color: this.color,
-        borderRadius: BorderRadius.circular(30.0),
+        borderRadius: BorderRadius.circular(18.0),
         child: MaterialButton(
           onPressed: onpress,
           minWidth: 200.0,
@@ -28,7 +28,7 @@ class RoundButton extends StatelessWidget {
           child: Text(
             text,
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.black,
             ),
           ),
         ),

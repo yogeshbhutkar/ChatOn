@@ -1,8 +1,9 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flash_chat/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 User loggedIn;
 
@@ -38,19 +39,29 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 0,
         leading: null,
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.close),
               onPressed: () async {
-                await _auth.signOut();
+                _auth.signOut();
                 Navigator.pop(context);
               }),
         ],
-        title: Text('⚡️Chat'),
-        backgroundColor: Colors.lightBlueAccent,
+        title: Text(
+          'Messages',
+          style: GoogleFonts.barlow(
+            textStyle: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        backgroundColor: Colors.black,
       ),
       body: SafeArea(
         child: Column(
@@ -65,6 +76,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: <Widget>[
                   Expanded(
                     child: TextField(
+                      style: TextStyle(color: Colors.white),
+                      cursorColor: Colors.white,
                       controller: messageTextController,
                       onChanged: (value) {
                         messageText = value;
@@ -77,15 +90,27 @@ class _ChatScreenState extends State<ChatScreen> {
                       if (messageText != null) {
                         _firestore.collection('messages').add({
                           'text': messageText,
-                          'sender': loggedIn.email,
+                          'sender': loggedIn.displayName != null
+                              ? loggedIn.displayName
+                              : loggedIn.email,
+                          'senderMail': loggedIn.email,
                           'Timestamp': FieldValue.serverTimestamp(),
                         });
                         messageTextController.clear();
                       }
                     },
-                    child: Text(
-                      'Send',
-                      style: kSendButtonTextStyle,
+                    child: Material(
+                      borderRadius: BorderRadius.circular(18),
+                      color: Color.fromARGB(255, 39, 38, 43),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Container(
+                          child: Icon(
+                            Icons.check,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -113,34 +138,41 @@ class BuildStreams extends StatelessWidget {
         stream:
             _firestore.collection('messages').orderBy('Timestamp').snapshots(),
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final messages = snapshot.data.docs.reversed;
-            List<messageBubble> messageWidgets = [];
-            for (var message in messages) {
-              Map<String, dynamic> myMap =
-                  message.data() as Map<String, dynamic>;
-              final messageText = myMap['text'];
-              final messageSender = myMap['sender'];
-              final currentUser = loggedIn.email;
-              final messagewidget = messageBubble(
-                sender: messageSender,
-                text: messageText,
-                isMe: currentUser == messageSender,
+          try {
+            if (snapshot.hasData) {
+              final messages = snapshot.data.docs.reversed;
+              List<messageBubble> messageWidgets = [];
+              for (var message in messages) {
+                Map<String, dynamic> myMap =
+                    message.data() as Map<String, dynamic>;
+                final messageText = myMap['text'];
+                final messageSender = myMap['sender'];
+                final currentUser = loggedIn.email;
+                final messagewidget = messageBubble(
+                  sender: messageSender,
+                  text: messageText,
+                  isMe: currentUser == messageSender ||
+                      loggedIn.displayName == messageSender,
+                );
+                messageWidgets.add(messagewidget);
+              }
+              return Expanded(
+                child: ListView(
+                  reverse: true,
+                  children: messageWidgets,
+                ),
               );
-              messageWidgets.add(messagewidget);
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.white,
+                ),
+              );
+            } else {
+              return Text('');
             }
-            return Expanded(
-              child: ListView(
-                reverse: true,
-                children: messageWidgets,
-              ),
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(
-                backgroundColor: Colors.lightBlueAccent,
-              ),
-            );
+          } catch (e) {
+            return Text('error occured');
           }
         });
   }
@@ -165,9 +197,9 @@ class messageBubble extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
-              sender,
+              sender == null ? "" : sender,
               style: TextStyle(
-                color: Colors.black54,
+                color: Colors.grey,
                 fontSize: 12.0,
               ),
             ),
@@ -185,13 +217,15 @@ class messageBubble extends StatelessWidget {
                     bottomRight: Radius.circular(30),
                     bottomLeft: Radius.circular(30),
                   ),
-            color: isMe ? Colors.lightBlueAccent : Colors.white,
+            color: isMe
+                ? Color.fromARGB(255, 32, 31, 31)
+                : Color.fromARGB(255, 58, 56, 56),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
               child: Text(
                 text,
                 style: TextStyle(
-                  color: isMe ? Colors.white : Colors.black,
+                  color: Colors.white,
                   fontSize: 15.0,
                 ),
               ),

@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1097460799908-amlkmscdjmai0sv45vni3dsjpeqlor3c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.bhutkaryogesh.flash_chat",
+            "certificate_hash": "0a7a1bbaf56022abf14b27b203bed93af19a576b"
+          }
+        },
+        {
           "client_id": "1097460799908-tpb5a8nmjj86uem5kau2p3hhh95j3ukm.apps.googleusercontent.com",
           "client_type": 3
         }

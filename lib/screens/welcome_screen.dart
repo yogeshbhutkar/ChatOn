@@ -2,6 +2,8 @@ import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flash_chat/screens/login_screen.dart';
 import 'package:flash_chat/screens/registration_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 
 import '../components/rounded_button.dart';
 
@@ -20,10 +22,11 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     super.initState();
     controller = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 2),
     );
-    animation = ColorTween(begin: Colors.blueGrey, end: Colors.white)
-        .animate(controller);
+    animation =
+        ColorTween(begin: Color.fromARGB(255, 38, 38, 41), end: Colors.black)
+            .animate(controller);
     controller.forward();
 
     controller.addListener(() {
@@ -43,53 +46,90 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       backgroundColor: animation.value,
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: ListView(
+          // crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Row(
-              children: <Widget>[
-                Hero(
-                  tag: 'logo',
-                  child: Container(
-                    child: Image.asset('images/logo.png'),
-                    height: 60.0,
+            Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 18.0),
+                  child: Lottie.asset('images/rotatingGlobe.json'),
+                ),
+              ],
+            ),
+            Column(
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.06,
+                ),
+                Text(
+                  'Stay in touch with the world.',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.barlow(
+                    textStyle: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 40.0,
+                    ),
                   ),
                 ),
-                SizedBox(
-                  child: DefaultTextStyle(
-                    style: TextStyle(
-                        fontSize: 45.0,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.black),
-                    child: AnimatedTextKit(
-                      animatedTexts: [
-                        TypewriterAnimatedText(
-                          'Flash Chat',
-                          speed: const Duration(milliseconds: 250),
-                        ),
-                      ],
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 24.0, top: 15.0, right: 24.0),
+                  child: Text(
+                    'Welcome to Chat-o, where the users can interact with anyone on this app.',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.barlow(
+                      textStyle: TextStyle(
+                        fontSize: 20,
+                        height: 1.25,
+                        letterSpacing: 1.5,
+                        color: Color(0xFFA5A4AC),
+                      ),
                     ),
                   ),
                 ),
               ],
             ),
             SizedBox(
-              height: 48.0,
+              height: MediaQuery.of(context).size.height * 0.1,
             ),
-            RoundButton(
-              text: 'Log in',
-              color: Colors.lightBlueAccent,
-              onpress: () {
-                Navigator.pushNamed(context, LoginScreen.id);
-              },
-            ),
-            RoundButton(
-              text: 'Register',
-              color: Colors.blueAccent,
-              onpress: () {
-                Navigator.pushNamed(context, RegistrationScreen.id);
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Material(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  child: TextButton(
+                    style: ButtonStyle(
+                        overlayColor:
+                            MaterialStateProperty.all(Colors.transparent)),
+                    onPressed: () {
+                      Navigator.pushNamed(context, RegistrationScreen.id);
+                    },
+                    child: Text(
+                      "Register",
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ),
+                ),
+                Material(
+                  borderRadius: BorderRadius.circular(18),
+                  color: Color(0xFF18171E),
+                  child: TextButton(
+                    style: ButtonStyle(
+                        overlayColor:
+                            MaterialStateProperty.all(Colors.transparent)),
+                    onPressed: () {
+                      Navigator.pushNamed(context, LoginScreen.id);
+                    },
+                    child: Text(
+                      "Sign in",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                )
+              ],
             ),
           ],
         ),
