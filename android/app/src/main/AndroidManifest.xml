@@ -2,7 +2,7 @@
     package="com.example.flash_chat">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="flash_chat"
+        android:label="Chat_on"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

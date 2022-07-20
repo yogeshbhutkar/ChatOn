@@ -1,4 +1,4 @@
-import 'package:flash_chat/screens/login_screen.dart';
+import 'package:flash_chat/screens/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -32,7 +32,15 @@ class _ChatScreenState extends State<ChatScreen> {
         loggedIn = user;
       }
     } catch (e) {
-      print(e);
+      // print(e);
+    }
+  }
+
+  ImageProvider img() {
+    if (loggedIn.photoURL == null) {
+      return AssetImage('images/profile.png');
+    } else {
+      return NetworkImage(loggedIn.photoURL);
     }
   }
 
@@ -45,12 +53,22 @@ class _ChatScreenState extends State<ChatScreen> {
         elevation: 0,
         leading: null,
         actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.close),
-              onPressed: () async {
-                _auth.signOut();
-                Navigator.pop(context);
-              }),
+          Hero(
+            tag: 'hero1',
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, UserProfile.id);
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(right: 15),
+                child: CircleAvatar(
+                  backgroundColor: Color.fromARGB(255, 51, 50, 56),
+                  radius: 25,
+                  backgroundImage: img(),
+                ),
+              ),
+            ),
+          )
         ],
         title: Text(
           'Messages',
@@ -90,9 +108,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       if (messageText != null) {
                         _firestore.collection('messages').add({
                           'text': messageText,
-                          'sender': loggedIn.displayName != null
-                              ? loggedIn.displayName
-                              : loggedIn.email,
+                          'sender': loggedIn.displayName == null
+                              ? loggedIn.email
+                              : loggedIn.displayName,
                           'senderMail': loggedIn.email,
                           'Timestamp': FieldValue.serverTimestamp(),
                         });
@@ -181,7 +199,6 @@ class BuildStreams extends StatelessWidget {
 class messageBubble extends StatelessWidget {
   const messageBubble({Key key, this.text, this.sender, this.isMe})
       : super(key: key);
-
   final String text;
   final String sender;
   final bool isMe;

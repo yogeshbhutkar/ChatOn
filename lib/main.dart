@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flash_chat/screens/initialScreen.dart';
+import 'package:flash_chat/screens/profile.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/screens/welcome_screen.dart';
 import 'package:flash_chat/screens/login_screen.dart';
@@ -12,6 +13,11 @@ bool isSignedIn = false;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseAuth.instance.authStateChanges().listen((User user) {
+    if (user != null) {
+      isSignedIn = true;
+    }
+  });
   runApp(FlashChat());
 }
 
@@ -19,14 +25,16 @@ class FlashChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: "Chat_on",
       debugShowCheckedModeBanner: false,
-      initialRoute: InitialScreen.id,
+      initialRoute: isSignedIn ? ChatScreen.id : WelcomeScreen.id,
       routes: {
         InitialScreen.id: (context) => InitialScreen(),
         WelcomeScreen.id: (context) => WelcomeScreen(),
         RegistrationScreen.id: (context) => RegistrationScreen(),
         LoginScreen.id: (context) => LoginScreen(),
         ChatScreen.id: (context) => ChatScreen(),
+        UserProfile.id: (context) => UserProfile(),
       },
     );
   }
