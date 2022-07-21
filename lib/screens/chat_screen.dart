@@ -1,9 +1,16 @@
 import 'package:flash_chat/screens/profile.dart';
+import 'package:flash_chat/screens/settings_screen.dart';
+import 'package:flash_chat/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../components/message_bubble.dart';
+import 'chat_bot.dart';
+import 'community.dart';
+import 'groups.dart';
 
 User loggedIn;
 
@@ -47,29 +54,21 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: drawerCode(context),
       backgroundColor: Colors.black,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
-        elevation: 0,
         leading: null,
         actions: <Widget>[
-          Hero(
-            tag: 'hero1',
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, UserProfile.id);
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(right: 15),
-                child: CircleAvatar(
-                  backgroundColor: Color.fromARGB(255, 51, 50, 56),
-                  radius: 25,
-                  backgroundImage: img(),
-                ),
-              ),
+          Padding(
+            padding: const EdgeInsets.only(right: 15),
+            child: CircleAvatar(
+              backgroundColor: Color.fromARGB(255, 51, 50, 56),
+              radius: 25,
+              backgroundImage: img(),
             ),
-          )
+          ),
         ],
+        centerTitle: true,
         title: Text(
           'Messages',
           style: GoogleFonts.barlow(
@@ -139,6 +138,171 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
     );
   }
+
+  Drawer drawerCode(BuildContext context) {
+    return Drawer(
+      child: Material(
+        color: Color(0xFF18171E),
+        child: ListView(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 40, left: 10),
+              child: Row(
+                children: [
+                  Hero(
+                    tag: 'hero1',
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, UserProfile.id);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 15),
+                        child: CircleAvatar(
+                          backgroundColor: Color.fromARGB(255, 51, 50, 56),
+                          radius: 25,
+                          backgroundImage: img(),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 3),
+                          child: Text(
+                            loggedIn.displayName ?? "",
+                            style: kDrawerTextStyle,
+                          ),
+                        ),
+                        Text(
+                          loggedIn.email,
+                          style: kDrawerTextStyle,
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 40,
+            ),
+            Divider(
+              color: Colors.grey.shade800,
+              thickness: 1.5,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, ChatScreen.id);
+              },
+              child: DrawerElement(
+                ic: Icons.home,
+                field: "Home",
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, CommunityScreen.id);
+              },
+              child: DrawerElement(
+                ic: Icons.travel_explore,
+                field: "Community",
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, GroupsScreen.id);
+              },
+              child: DrawerElement(
+                ic: Icons.group,
+                field: "Groups",
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, ChatBotScreen.id);
+              },
+              child: DrawerElement(
+                ic: Icons.chat,
+                field: "Mr. Chatty",
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Divider(
+              color: Colors.grey.shade800,
+              thickness: 1.5,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, SettingsScreen.id);
+              },
+              child: DrawerElement(
+                ic: Icons.settings,
+                field: "Setting",
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                _auth.signOut();
+                googleSignIn.disconnect();
+                Navigator.pushNamed(context, WelcomeScreen.id);
+              },
+              child: DrawerElement(
+                ic: Icons.logout,
+                field: "Sign Out",
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DrawerElement extends StatelessWidget {
+  final IconData ic;
+  final String field;
+  DrawerElement({
+    Key key,
+    this.ic,
+    this.field,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 25),
+            child: Icon(
+              ic,
+              color: Colors.white,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 25),
+            child: Text(
+              field,
+              style: kDrawerTextStyle,
+            ),
+          )
+        ],
+      ),
+    );
+  }
 }
 
 class BuildStreams extends StatelessWidget {
@@ -193,63 +357,5 @@ class BuildStreams extends StatelessWidget {
             return Text('error occured');
           }
         });
-  }
-}
-
-class messageBubble extends StatelessWidget {
-  const messageBubble({Key key, this.text, this.sender, this.isMe})
-      : super(key: key);
-  final String text;
-  final String sender;
-  final bool isMe;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: Column(
-        crossAxisAlignment:
-            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(
-              sender == null ? "" : sender,
-              style: TextStyle(
-                color: Colors.grey,
-                fontSize: 12.0,
-              ),
-            ),
-          ),
-          Material(
-            elevation: 5.0,
-            borderRadius: isMe
-                ? BorderRadius.only(
-                    topLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                    bottomLeft: Radius.circular(30),
-                  )
-                : BorderRadius.only(
-                    topRight: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                    bottomLeft: Radius.circular(30),
-                  ),
-            color: isMe
-                ? Color.fromARGB(255, 32, 31, 31)
-                : Color.fromARGB(255, 58, 56, 56),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-              child: Text(
-                text,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15.0,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

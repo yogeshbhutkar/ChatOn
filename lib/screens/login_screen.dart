@@ -34,7 +34,6 @@ class _LoginScreenState extends State<LoginScreen> {
             padding: EdgeInsets.symmetric(horizontal: 24.0),
             child: SafeArea(
               child: ListView(
-                // crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flash_chat/screens/initialScreen.dart';
+import 'package:flash_chat/screens/chat_bot.dart';
+import 'package:flash_chat/screens/community.dart';
+import 'package:flash_chat/screens/groups.dart';
 import 'package:flash_chat/screens/profile.dart';
+import 'package:flash_chat/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/screens/welcome_screen.dart';
 import 'package:flash_chat/screens/login_screen.dart';
@@ -29,12 +32,15 @@ class FlashChat extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: isSignedIn ? ChatScreen.id : WelcomeScreen.id,
       routes: {
-        InitialScreen.id: (context) => InitialScreen(),
         WelcomeScreen.id: (context) => WelcomeScreen(),
         RegistrationScreen.id: (context) => RegistrationScreen(),
         LoginScreen.id: (context) => LoginScreen(),
         ChatScreen.id: (context) => ChatScreen(),
         UserProfile.id: (context) => UserProfile(),
+        ChatBotScreen.id: (context) => ChatBotScreen(),
+        CommunityScreen.id: (context) => CommunityScreen(),
+        GroupsScreen.id: (context) => GroupsScreen(),
+        SettingsScreen.id: (context) => SettingsScreen()
       },
     );
   }
