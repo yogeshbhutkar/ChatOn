@@ -28,3 +28,5 @@ After the termination of build process, make the flutter app using the following
 You will find the app being present in the output folder inside the android directory.
 
 Install it in your device and enjoy!!!
+
+!(chaton1.jpeg)
