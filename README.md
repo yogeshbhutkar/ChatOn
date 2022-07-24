@@ -1,16 +1,30 @@
-# flash_chat
 
-A new Flutter project.
+# Chat_on
 
-## Getting Started
+Allow me to present you Chat_on, a group chatting application with a built in chat bot which
+comes in both light and dark mode. Now, chatting with your closed ones is made easier with Chat_on.
 
-This project is a starting point for a Flutter application.
+Practically ask anything to the chat bot Mr. Chatty, thanks to Wolfram Alpha's awesome API.
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Installation
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Install Chat_on
+
+```bash
+  Clone this repository.
+```
+    
+```bash
+  Keeping in mind you have flutter installed, now start the build process.
+```
+
+After the termination of build process, make the flutter app using the following code:
+
+```bash
+  flutter build apk --split-per-abi
+```
+
+You will find the app being present in the output folder inside the android directory.
+
+Install it in your device and enjoy!!!
