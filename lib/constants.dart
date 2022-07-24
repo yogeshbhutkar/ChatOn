@@ -19,7 +19,9 @@ const kMessageContainerDecoration = BoxDecoration(
   ),
 );
 
-const kDrawerTextStyle = TextStyle(color: Colors.white);
+const kDrawerTextStyleDark =
+    TextStyle(color: Color.fromARGB(255, 190, 189, 189));
+const KDrawerTextStyleLight = TextStyle(color: Colors.black);
 
 const kTextFieldDecoration = InputDecoration(
   filled: true,

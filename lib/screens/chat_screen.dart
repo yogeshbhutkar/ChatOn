@@ -6,6 +6,7 @@ import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 
 import '../components/message_bubble.dart';
 import 'chat_bot.dart';
@@ -14,22 +15,34 @@ import 'groups.dart';
 
 User loggedIn;
 
+bool darkMode = true;
+
 class ChatScreen extends StatefulWidget {
   static String id = 'chat_screen';
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen>
+    with SingleTickerProviderStateMixin {
   final messageTextController = TextEditingController();
   final _firestore = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
   String messageText;
+  AnimationController controller;
 
   @override
   void initState() {
     getCurrentUser();
     super.initState();
+    controller =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 750));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    controller.dispose();
   }
 
   void getCurrentUser() {
@@ -38,9 +51,7 @@ class _ChatScreenState extends State<ChatScreen> {
       if (user != null) {
         loggedIn = user;
       }
-    } catch (e) {
-      // print(e);
-    }
+    } catch (e) {}
   }
 
   ImageProvider img() {
@@ -55,16 +66,39 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: drawerCode(context),
-      backgroundColor: Colors.black,
+      backgroundColor: darkMode ? Colors.black : Colors.white,
       appBar: AppBar(
-        leading: null,
+        leading: Builder(
+          builder: (context) => IconButton(
+            icon: Icon(
+              Icons.menu_rounded,
+              color: darkMode ? Colors.white : Colors.black,
+            ),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
+        elevation: 0,
         actions: <Widget>[
           Padding(
-            padding: const EdgeInsets.only(right: 15),
-            child: CircleAvatar(
-              backgroundColor: Color.fromARGB(255, 51, 50, 56),
-              radius: 25,
-              backgroundImage: img(),
+            padding: const EdgeInsets.only(
+              right: 10,
+            ),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  if (darkMode == true) {
+                    darkMode = false;
+                    controller.forward();
+                  } else {
+                    darkMode = true;
+                    controller.reverse();
+                  }
+                });
+              },
+              child: Lottie.asset('images/darkmode.json',
+                  controller: controller, width: 80),
             ),
           ),
         ],
@@ -72,13 +106,14 @@ class _ChatScreenState extends State<ChatScreen> {
         title: Text(
           'Messages',
           style: GoogleFonts.barlow(
+            color: darkMode ? Colors.white : Colors.black,
             textStyle: TextStyle(
               fontSize: 30,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
-        backgroundColor: Colors.black,
+        backgroundColor: darkMode ? Colors.black : Colors.white,
       ),
       body: SafeArea(
         child: Column(
@@ -93,7 +128,8 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: <Widget>[
                   Expanded(
                     child: TextField(
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(
+                          color: darkMode ? Colors.white : Colors.black),
                       cursorColor: Colors.white,
                       controller: messageTextController,
                       onChanged: (value) {
@@ -104,6 +140,23 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   MaterialButton(
                     onPressed: () {
+                      final time = (DateTime.now()).toString();
+                      final timeDetails = time.split(' ');
+                      final entryTime = timeDetails[1].split(':');
+                      int hours = int.parse(entryTime[0]);
+                      int minutes = int.parse(entryTime[1]);
+                      String zone = '';
+                      if (hours > 12) {
+                        hours = hours - 12;
+                        zone = 'PM';
+                      } else {
+                        zone = 'AM';
+                      }
+                      String timeInfo = hours.toString() +
+                          ":" +
+                          minutes.toString() +
+                          " " +
+                          zone;
                       if (messageText != null) {
                         _firestore.collection('messages').add({
                           'text': messageText,
@@ -112,6 +165,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               : loggedIn.displayName,
                           'senderMail': loggedIn.email,
                           'Timestamp': FieldValue.serverTimestamp(),
+                          'Timeinfo': timeInfo,
                         });
                         messageTextController.clear();
                       }
@@ -142,7 +196,7 @@ class _ChatScreenState extends State<ChatScreen> {
   Drawer drawerCode(BuildContext context) {
     return Drawer(
       child: Material(
-        color: Color(0xFF18171E),
+        color: darkMode ? Color(0xFF18171E) : Colors.white,
         child: ListView(
           children: [
             Padding(
@@ -174,12 +228,16 @@ class _ChatScreenState extends State<ChatScreen> {
                           padding: const EdgeInsets.only(bottom: 3),
                           child: Text(
                             loggedIn.displayName ?? "",
-                            style: kDrawerTextStyle,
+                            style: darkMode
+                                ? kDrawerTextStyleDark
+                                : KDrawerTextStyleLight,
                           ),
                         ),
                         Text(
                           loggedIn.email,
-                          style: kDrawerTextStyle,
+                          style: darkMode
+                              ? kDrawerTextStyleDark
+                              : KDrawerTextStyleLight,
                         )
                       ],
                     ),
@@ -191,7 +249,7 @@ class _ChatScreenState extends State<ChatScreen> {
               height: 40,
             ),
             Divider(
-              color: Colors.grey.shade800,
+              color: darkMode ? Colors.grey.shade800 : Colors.grey.shade300,
               thickness: 1.5,
             ),
             SizedBox(
@@ -208,25 +266,8 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
             GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, CommunityScreen.id);
-              },
-              child: DrawerElement(
-                ic: Icons.travel_explore,
-                field: "Community",
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, GroupsScreen.id);
-              },
-              child: DrawerElement(
-                ic: Icons.group,
-                field: "Groups",
-              ),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, ChatBotScreen.id);
+                Navigator.pushNamed(context, ChatBotScreen.id,
+                    arguments: darkMode);
               },
               child: DrawerElement(
                 ic: Icons.chat,
@@ -237,20 +278,11 @@ class _ChatScreenState extends State<ChatScreen> {
               height: 20,
             ),
             Divider(
-              color: Colors.grey.shade800,
+              color: darkMode ? Colors.grey.shade800 : Colors.grey.shade300,
               thickness: 1.5,
             ),
             SizedBox(
               height: 20,
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, SettingsScreen.id);
-              },
-              child: DrawerElement(
-                ic: Icons.settings,
-                field: "Setting",
-              ),
             ),
             GestureDetector(
               onTap: () {
@@ -289,14 +321,14 @@ class DrawerElement extends StatelessWidget {
             padding: const EdgeInsets.only(left: 25),
             child: Icon(
               ic,
-              color: Colors.white,
+              color: darkMode ? Colors.white : Colors.black,
             ),
           ),
           Padding(
             padding: const EdgeInsets.only(left: 25),
             child: Text(
               field,
-              style: kDrawerTextStyle,
+              style: darkMode ? kDrawerTextStyleDark : KDrawerTextStyleLight,
             ),
           )
         ],
@@ -329,12 +361,14 @@ class BuildStreams extends StatelessWidget {
                     message.data() as Map<String, dynamic>;
                 final messageText = myMap['text'];
                 final messageSender = myMap['sender'];
+                final time = myMap['Timeinfo'];
                 final currentUser = loggedIn.email;
                 final messagewidget = messageBubble(
                   sender: messageSender,
                   text: messageText,
                   isMe: currentUser == messageSender ||
                       loggedIn.displayName == messageSender,
+                  timeStamp: time,
                 );
                 messageWidgets.add(messagewidget);
               }

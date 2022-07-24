@@ -24,18 +24,9 @@ class BotBrain {
           'http://api.wolframalpha.com/v1/result?appid=W4A796-7L43G5G3LW&i=$updatedText%3f'),
     );
     return jsonDecode(jsonEncode(s.body)) ==
-            'Wolfram|Alpha did not understand your input'
-        ? 'What??'
+                'Wolfram|Alpha did not understand your input' ||
+            jsonDecode(jsonEncode(s.body)) == 'an empty list'
+        ? 'I didn\'t quite get you.'
         : jsonDecode(jsonEncode(s.body));
-  }
-
-  String response() {
-    if (this.query.contains('Hi')) {
-      return 'Hey there! What\'s up?';
-    } else if (this.query.contains('fine')) {
-      return 'Great my darling!';
-    } else {
-      return '';
-    }
   }
 }

@@ -1,4 +1,3 @@
-import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 
 class botMessageBubble extends StatelessWidget {
@@ -39,7 +38,9 @@ class botMessageBubble extends StatelessWidget {
                 ),
               ),
               Container(
-                width: MediaQuery.of(context).size.width * 0.7,
+                constraints: BoxConstraints(
+                  maxWidth: MediaQuery.of(context).size.width * 0.7,
+                ),
                 child: Material(
                   elevation: 5.0,
                   borderRadius: isMe

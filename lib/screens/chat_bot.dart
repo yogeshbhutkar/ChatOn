@@ -1,6 +1,7 @@
 import 'package:flash_chat/components/bot_brain.dart';
 import 'package:flash_chat/components/bot_message_bubble.dart';
 import 'package:flash_chat/components/message_bubble.dart';
+import 'package:flash_chat/components/theme.dart';
 import 'package:flash_chat/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import '../constants.dart';
@@ -14,13 +15,26 @@ class ChatBotScreen extends StatefulWidget {
 }
 
 class _ChatBotScreenState extends State<ChatBotScreen> {
+  void pushMessage() async {
+    String t = await BotBrain(messageText).getAnswer(messageText);
+    setState(() {
+      bubbleWidgets.add(botMessageBubble(
+        isMe: false,
+        sender: 'Mr. Chatty',
+        text: t,
+        imagePath: 'images/robot.png',
+      ));
+    });
+  }
+
   final messageTextController = TextEditingController();
   List<dynamic> bubbleWidgets = [];
   String messageText;
   @override
   Widget build(BuildContext context) {
+    final darkmode = ModalRoute.of(context).settings.arguments;
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: darkmode ? Colors.black : Colors.white,
       body: Column(children: [
         Expanded(
           child: ListView.builder(
@@ -38,7 +52,8 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
             children: <Widget>[
               Expanded(
                 child: TextField(
-                  style: TextStyle(color: Colors.white),
+                  style:
+                      TextStyle(color: darkmode ? Colors.white : Colors.black),
                   cursorColor: Colors.white,
                   controller: messageTextController,
                   onChanged: (value) {
@@ -50,21 +65,13 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
               MaterialButton(
                 onPressed: () async {
                   if (messageText != null) {
-                    String t =
-                        await BotBrain(messageText).getAnswer(messageText);
-
                     setState(() {
                       bubbleWidgets.add(messageBubble(
                         isMe: true,
                         sender: loggedIn.displayName ?? loggedIn.email,
                         text: messageText,
                       ));
-                      bubbleWidgets.add(botMessageBubble(
-                        isMe: false,
-                        sender: 'Mr. Chatty',
-                        text: t,
-                        imagePath: 'images/robot.png',
-                      ));
+                      pushMessage();
                     });
                     messageTextController.clear();
                   }
