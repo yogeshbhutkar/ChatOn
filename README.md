@@ -29,4 +29,4 @@ You will find the app being present in the output folder inside the android dire
 
 Install it in your device and enjoy!!!
 
-!(./chaton1.jpeg)
+![ChatOn1](chaton1.jpeg)
